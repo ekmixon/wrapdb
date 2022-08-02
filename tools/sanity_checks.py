@@ -90,8 +90,7 @@ class TestReleases(unittest.TestCase):
                         self.assertIn('provide', config.sections())
                         self.assertTrue(config.items('provide'))
 
-                patch_directory = wrap_section.get('patch_directory')
-                if patch_directory:
+                if patch_directory := wrap_section.get('patch_directory'):
                     with self.subTest(step='patch_directory'):
                         patch_path = Path('subprojects', 'packagefiles', patch_directory)
 
@@ -182,9 +181,10 @@ class TestReleases(unittest.TestCase):
             return True
         if filename.endswith('.h.meson'):
             return True
-        if subproject in PER_PROJECT_PERMITTED_FILES and filename in PER_PROJECT_PERMITTED_FILES[subproject]:
-            return True
-        return False
+        return (
+            subproject in PER_PROJECT_PERMITTED_FILES
+            and filename in PER_PROJECT_PERMITTED_FILES[subproject]
+        )
 
     def check_files(self, subproject, patch_path):
         tabs = []
@@ -198,10 +198,10 @@ class TestReleases(unittest.TestCase):
                 tabs.append(f)
         if tabs:
             tabs_str = ', '.join([str(f) for f in tabs])
-            self.fail('Tabs in meson files are not allows: ' + tabs_str)
+            self.fail(f'Tabs in meson files are not allows: {tabs_str}')
         if not_permitted:
             not_permitted_str = ', '.join([str(f) for f in not_permitted])
-            self.fail('Not permitted files found: ' + not_permitted_str)
+            self.fail(f'Not permitted files found: {not_permitted_str}')
 
 
 if __name__ == '__main__':
